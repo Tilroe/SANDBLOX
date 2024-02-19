@@ -6,6 +6,11 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+// Forward declaration
+class UCapsuleComponent;
+class USpringArmComponent;
+class UCameraComponent;
+
 UCLASS()
 class SANDBLOX_API APlayerPawn : public APawn
 {
@@ -15,15 +20,27 @@ public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	void Forward(float Value);
+	void Right(float Value);
+	void Turn(float Value);
+	void LookUp(float Value);
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	UCapsuleComponent* Capsule;
+
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* ViewCamera;
 };
