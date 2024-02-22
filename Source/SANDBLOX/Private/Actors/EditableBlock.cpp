@@ -2,12 +2,14 @@
 
 
 #include "Actors/EditableBlock.h"
+#include "SANDBLOX/DrawBebugMacros.h"
 
 // Sets default values
 AEditableBlock::AEditableBlock()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	Vertices = { FVector(10.f, 10.f, 10.f) };
 
 }
 
@@ -22,6 +24,10 @@ void AEditableBlock::BeginPlay()
 void AEditableBlock::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	for (FVector Vertex : Vertices) {
+		DRAW_POINT_SingleFrame(Vertex);
+	}
 
 }
 
