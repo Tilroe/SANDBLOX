@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "EditableBlock.generated.h"
 
+
 UCLASS()
 class SANDBLOX_API AEditableBlock : public AActor
 {
@@ -21,9 +22,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	FVector3f getVertex(int32 Index);
 
 private:
-	TArray<FVector> Vertices;
-	
+	void GenerateBody();
 
+
+	TArray<FVector3f> Vertices;
+	class UProceduralMeshComponent *Mesh;
+	
 };
