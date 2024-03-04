@@ -19,6 +19,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+#if WITH_EDITOR
+	virtual void OnConstruction(const FTransform& Transform) override;
+#endif
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,5 +32,14 @@ private:
 	bool GenerateBody();
 
 	TArray<FVector> Vertices;
-	class UProceduralMeshComponent *Mesh;	
+	class UProceduralMeshComponent *Mesh;
+
+	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UMaterialInterface* TopMaterial;
+
+	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UMaterialInterface* BottomMaterial;
+
+	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UMaterialInterface* DefaultMaterial;
 };

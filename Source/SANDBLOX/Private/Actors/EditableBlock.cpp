@@ -84,13 +84,38 @@ bool AEditableBlock::GenerateBody()
 				}
 			}
 
+			// Normals
 			TArray<FVector> Normals; Normals.Init(Normal, FaceVertices.Num());
-			TArray<FVector2D> UV0; // Empty UV coordinates
+
+			// UV Coordiantes
+			TArray<FVector2D> UV0;
+			for (int32 FaceIndex = 0; FaceIndex < FaceVertices.Num(); FaceIndex++)
+			{
+				// Determine a local 2D coordinate system for each face
+				FVector FaceTangent = FVector::CrossProduct(Normal, FVector::UpVector);
+				FVector FaceBitangent = FVector::CrossProduct(Normal, FaceTangent);
+				FVector2D UVCoords;
+
+				// Project vertices onto the local 2D coordinate system
+				FVector LocalVertex = FVector::VectorPlaneProject(FaceVertices[FaceIndex], Normal);
+				float U = FVector::DotProduct(LocalVertex, FaceTangent);
+				float V = FVector::DotProduct(LocalVertex, FaceBitangent);
+				UVCoords.X = U;
+				UVCoords.Y = V;
+
+				// Normalize UV coordinates if necessary
+				UVCoords.Normalize();
+
+				UV0.Add(UVCoords);
+			}
+
 			TArray<FColor> VertexColors; // Empty vertex colors
 			TArray<FProcMeshTangent> Tangents; // Empty tangents
 
-			// CreateMeshSection has more parameters, added dummy ones for demonstration
-			this->Mesh->CreateMeshSection(FaceCount, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, false);
+			// Create Mesh Section for this face
+			Mesh->CreateMeshSection(FaceCount, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, false);
+			Mesh->SetMaterial(FaceCount, DefaultMaterial);
+
 			FaceCount++;
 		},
 		[&](int32 Value) {return UE::Math::TVector<float>(this->getVertex(Value)); }
@@ -103,5 +128,11 @@ bool AEditableBlock::GenerateBody()
 void AEditableBlock::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AEditableBlock::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	GenerateBody();
 }
 
