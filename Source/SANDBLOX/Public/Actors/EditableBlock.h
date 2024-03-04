@@ -22,13 +22,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	FVector3f getVertex(int32 Index);
+	FVector getVertex(int32 Index);
 
 private:
-	void GenerateBody();
+	bool GenerateBody();
 
-
-	TArray<FVector3f> Vertices;
-	class UProceduralMeshComponent *Mesh;
-	
+	TArray<FVector> Vertices;
+	class UProceduralMeshComponent *Mesh;	
 };
