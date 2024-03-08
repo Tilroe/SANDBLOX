@@ -42,6 +42,8 @@ FVector AEditableBlock::getVertex(int32 Index)
 
 bool AEditableBlock::GenerateBody()
 {
+	Mesh->ClearAllMeshSections();
+
 	// Compute the convex hull
 	UE::Geometry::FConvexHull3f ConvexHull;
 	ConvexHull.bSaveTriangleNeighbors = true;
