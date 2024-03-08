@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "EditableBlock.generated.h"
 
+
 UCLASS()
 class SANDBLOX_API AEditableBlock : public AActor
 {
@@ -18,12 +19,28 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+#if WITH_EDITOR
+	virtual void OnConstruction(const FTransform& Transform) override;
+#endif
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	FVector getVertex(int32 Index);
 
 private:
-	TArray<FVector> Vertices;
-	
+	bool GenerateBody();
+	class UProceduralMeshComponent *Mesh;
 
+	UPROPERTY(EditInstanceOnly, Category = "Shape")
+	TArray<FVector> Vertices;
+
+	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UMaterialInterface* TopMaterial;
+
+	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UMaterialInterface* BottomMaterial;
+
+	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UMaterialInterface* DefaultMaterial;
 };
