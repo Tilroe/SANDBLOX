@@ -30,9 +30,10 @@ protected:
 
 private:
 	bool GenerateBody();
-
-	TArray<FVector> Vertices;
 	class UProceduralMeshComponent *Mesh;
+
+	UPROPERTY(EditInstanceOnly, Category = "Shape")
+	TArray<FVector> Vertices;
 
 	UPROPERTY(EditInstanceOnly, Category = "Material")
 	UMaterialInterface* TopMaterial;

@@ -15,15 +15,14 @@ AEditableBlock::AEditableBlock()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Vertices = {
-		FVector(-5.f, -5.f, -5.f),
-		FVector(5.f, -5.f, -5.f),
-		FVector(-5.f, 5.f, -5.f),
-		FVector(5.f, 5.f, -5.f),
-		FVector(-5.f, -5.f, 5.f),
-		FVector(5.f, -5.f, 5.f),
-		FVector(-5.f, 5.f, 5.f),
-		FVector(5.f, 5.f, 5.f),
-		FVector(0, 0, 10)
+		FVector(0, 0, 0),
+		FVector(50, 0, 0),
+		FVector(0, 50, 0),
+		FVector(50, 50, 0),
+		FVector(0, 0, 50),
+		FVector(50, 0, 50),
+		FVector(0, 50, 50),
+		FVector(50, 50, 50),
 	};
 	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);	
