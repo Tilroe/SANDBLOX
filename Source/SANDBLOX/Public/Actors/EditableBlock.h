@@ -26,7 +26,18 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	FVector getVertex(int32 Index);
+
+	UFUNCTION(BlueprintPure)
+	FVector GetVertex(int32 Index);
+
+	UFUNCTION(BlueprintPure)
+	TArray<FVector> GetVertices();
+
+	UFUNCTION(BlueprintCallable)
+	void SetVertices(TArray<FVector> NewVertices);
+
+	UFUNCTION(BlueprintCallable)
+	void AddVertex(FVector NewVertex);
 
 private:
 	bool GenerateBody();
