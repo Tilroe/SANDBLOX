@@ -14,16 +14,6 @@ AEditableBlock::AEditableBlock()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	Vertices = {
-		FVector(0, 0, 0),
-		FVector(50, 0, 0),
-		FVector(0, 50, 0),
-		FVector(50, 50, 0),
-		FVector(0, 0, 50),
-		FVector(50, 0, 50),
-		FVector(0, 50, 50),
-		FVector(50, 50, 50),
-	};
 	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);	
 }
@@ -35,9 +25,24 @@ void AEditableBlock::BeginPlay()
 	GenerateBody();
 }
 
-FVector AEditableBlock::getVertex(int32 Index)
+FVector AEditableBlock::GetVertex(int32 Index)
 {
 	return Vertices[Index];
+}
+
+TArray<FVector> AEditableBlock::GetVertices()
+{
+	return Vertices;
+}
+
+void AEditableBlock::SetVertices(TArray<FVector> NewVertices)
+{
+	Vertices = NewVertices;
+}
+
+void AEditableBlock::AddVertex(FVector NewVertex)
+{
+	Vertices.Add(NewVertex);
 }
 
 bool AEditableBlock::GenerateBody()
@@ -66,7 +71,7 @@ bool AEditableBlock::GenerateBody()
 			int32 LocalID = 0;
 			for (int32 FaceVertexID : VertexIDs) 
 			{ 
-				FaceVertices.Add({ this->getVertex(FaceVertexID) });
+				FaceVertices.Add({ this->GetVertex(FaceVertexID) });
 				GlobalToLocalVertexIDMap.Add(FaceVertexID, LocalID++);
 			}
 
@@ -114,12 +119,12 @@ bool AEditableBlock::GenerateBody()
 			TArray<FProcMeshTangent> Tangents; // Empty tangents
 
 			// Create Mesh Section for this face
-			Mesh->CreateMeshSection(FaceCount, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, false);
+			Mesh->CreateMeshSection(FaceCount, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, true);
 			Mesh->SetMaterial(FaceCount, DefaultMaterial);
 
 			FaceCount++;
 		},
-		[&](int32 Value) {return UE::Math::TVector<float>(this->getVertex(Value)); }
+		[&](int32 Value) {return UE::Math::TVector<float>(this->GetVertex(Value)); }
 	);
 
 	return true;
