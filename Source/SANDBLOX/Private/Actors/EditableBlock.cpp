@@ -16,6 +16,8 @@ AEditableBlock::AEditableBlock()
 	PrimaryActorTick.bCanEverTick = true;
 	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);	
+	Vertices = {};
+	UE_LOG(LogTemp, Warning, TEXT("%i"), Vertices.Num())
 }
 
 // Called when the game starts or when spawned
@@ -55,8 +57,14 @@ bool AEditableBlock::GenerateBody()
 	bool result = ConvexHull.Solve<FVector3f>(TArray<FVector3f>(Vertices));
 	if (!result) { return false; }
 
+	for (FVector v : Vertices) {
+		UE_LOG(LogTemp, Warning, TEXT("Vertex: %s"), *v.ToString())
+	}
+
 	// Convex hull triangles
 	TArray<UE::Geometry::FIndex3i> Triangles = ConvexHull.GetTriangles();
+
+	UE_LOG(LogTemp, Warning, TEXT("Generating Body.."))
 
 	// Add each face as a different section to procedural mesh component
 	int32 FaceCount = 0;
@@ -64,7 +72,7 @@ bool AEditableBlock::GenerateBody()
 		[&](const TArray<int32> VertexIDs, const FVector3f FaceNormal)
 		{
 			FVector Normal = FVector(FaceNormal);
-
+			UE_LOG(LogTemp, Warning, TEXT("Normal: %s"), *Normal.ToString())
 			// Get Vertices for this face, and map them to new face-local IDs
 			TMap<int32, int32> GlobalToLocalVertexIDMap;
 			TArray<FVector> FaceVertices;
@@ -134,11 +142,5 @@ bool AEditableBlock::GenerateBody()
 void AEditableBlock::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-void AEditableBlock::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-	GenerateBody();
 }
 
