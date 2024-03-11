@@ -17,7 +17,6 @@ AEditableBlock::AEditableBlock()
 	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);	
 	Vertices = {};
-	UE_LOG(LogTemp, Warning, TEXT("%i"), Vertices.Num())
 }
 
 // Called when the game starts or when spawned
@@ -57,14 +56,13 @@ bool AEditableBlock::GenerateBody()
 	bool result = ConvexHull.Solve<FVector3f>(TArray<FVector3f>(Vertices));
 	if (!result) { return false; }
 
+	/*UE_LOG(LogTemp, Warning, TEXT("%i"), Vertices.Num())
 	for (FVector v : Vertices) {
 		UE_LOG(LogTemp, Warning, TEXT("Vertex: %s"), *v.ToString())
-	}
+	}*/
 
 	// Convex hull triangles
 	TArray<UE::Geometry::FIndex3i> Triangles = ConvexHull.GetTriangles();
-
-	UE_LOG(LogTemp, Warning, TEXT("Generating Body.."))
 
 	// Add each face as a different section to procedural mesh component
 	int32 FaceCount = 0;
