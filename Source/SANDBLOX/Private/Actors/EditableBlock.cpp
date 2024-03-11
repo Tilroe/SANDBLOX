@@ -14,18 +14,10 @@ AEditableBlock::AEditableBlock()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	Vertices = {
-		FVector(0, 0, 0),
-		FVector(50, 0, 0),
-		FVector(0, 50, 0),
-		FVector(50, 50, 0),
-		FVector(0, 0, 50),
-		FVector(50, 0, 50),
-		FVector(0, 50, 50),
-		FVector(50, 50, 50),
-	};
 	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);	
+	Vertices = {};
+	UE_LOG(LogTemp, Warning, TEXT("%i"), Vertices.Num())
 }
 
 // Called when the game starts or when spawned
@@ -35,21 +27,44 @@ void AEditableBlock::BeginPlay()
 	GenerateBody();
 }
 
-FVector AEditableBlock::getVertex(int32 Index)
+FVector AEditableBlock::GetVertex(int32 Index)
 {
 	return Vertices[Index];
 }
 
+TArray<FVector> AEditableBlock::GetVertices()
+{
+	return Vertices;
+}
+
+void AEditableBlock::SetVertices(TArray<FVector> NewVertices)
+{
+	Vertices = NewVertices;
+}
+
+void AEditableBlock::AddVertex(FVector NewVertex)
+{
+	Vertices.Add(NewVertex);
+}
+
 bool AEditableBlock::GenerateBody()
 {
+	Mesh->ClearAllMeshSections();
+
 	// Compute the convex hull
 	UE::Geometry::FConvexHull3f ConvexHull;
 	ConvexHull.bSaveTriangleNeighbors = true;
 	bool result = ConvexHull.Solve<FVector3f>(TArray<FVector3f>(Vertices));
 	if (!result) { return false; }
 
+	for (FVector v : Vertices) {
+		UE_LOG(LogTemp, Warning, TEXT("Vertex: %s"), *v.ToString())
+	}
+
 	// Convex hull triangles
 	TArray<UE::Geometry::FIndex3i> Triangles = ConvexHull.GetTriangles();
+
+	UE_LOG(LogTemp, Warning, TEXT("Generating Body.."))
 
 	// Add each face as a different section to procedural mesh component
 	int32 FaceCount = 0;
@@ -57,14 +72,14 @@ bool AEditableBlock::GenerateBody()
 		[&](const TArray<int32> VertexIDs, const FVector3f FaceNormal)
 		{
 			FVector Normal = FVector(FaceNormal);
-
+			UE_LOG(LogTemp, Warning, TEXT("Normal: %s"), *Normal.ToString())
 			// Get Vertices for this face, and map them to new face-local IDs
 			TMap<int32, int32> GlobalToLocalVertexIDMap;
 			TArray<FVector> FaceVertices;
 			int32 LocalID = 0;
 			for (int32 FaceVertexID : VertexIDs) 
 			{ 
-				FaceVertices.Add({ this->getVertex(FaceVertexID) });
+				FaceVertices.Add({ this->GetVertex(FaceVertexID) });
 				GlobalToLocalVertexIDMap.Add(FaceVertexID, LocalID++);
 			}
 
@@ -112,12 +127,12 @@ bool AEditableBlock::GenerateBody()
 			TArray<FProcMeshTangent> Tangents; // Empty tangents
 
 			// Create Mesh Section for this face
-			Mesh->CreateMeshSection(FaceCount, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, false);
+			Mesh->CreateMeshSection(FaceCount, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, true);
 			Mesh->SetMaterial(FaceCount, DefaultMaterial);
 
 			FaceCount++;
 		},
-		[&](int32 Value) {return UE::Math::TVector<float>(this->getVertex(Value)); }
+		[&](int32 Value) {return UE::Math::TVector<float>(this->GetVertex(Value)); }
 	);
 
 	return true;
@@ -127,11 +142,5 @@ bool AEditableBlock::GenerateBody()
 void AEditableBlock::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-void AEditableBlock::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-	GenerateBody();
 }
 
