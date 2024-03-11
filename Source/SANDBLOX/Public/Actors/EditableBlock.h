@@ -19,17 +19,26 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-#if WITH_EDITOR
-	virtual void OnConstruction(const FTransform& Transform) override;
-#endif
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	FVector getVertex(int32 Index);
+
+	UFUNCTION(BlueprintPure)
+	FVector GetVertex(int32 Index);
+
+	UFUNCTION(BlueprintPure)
+	TArray<FVector> GetVertices();
+
+	UFUNCTION(BlueprintCallable)
+	void SetVertices(TArray<FVector> NewVertices);
+
+	UFUNCTION(BlueprintCallable)
+	void AddVertex(FVector NewVertex);
 
 private:
+	UFUNCTION(BlueprintCallable)
 	bool GenerateBody();
+
 	class UProceduralMeshComponent *Mesh;
 
 	UPROPERTY(EditInstanceOnly, Category = "Shape")
