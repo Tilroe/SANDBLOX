@@ -45,6 +45,11 @@ void AEditableBlock::AddVertex(FVector NewVertex)
 {
 	Vertices.Add(NewVertex);
 }
+void AEditableBlock::SetMaterial(UMaterialInstance* MaterialInstance)
+{
+	MeshMaterialInstance = MaterialInstance;
+	// You can perform any additional operations you need here, such as applying the material to the mesh.
+}
 
 bool AEditableBlock::GenerateBody()
 {
@@ -121,12 +126,12 @@ bool AEditableBlock::GenerateBody()
 				UV0.Add(UVCoords);
 			}
 
-			TArray<FColor> VertexColors; // Empty vertex colors
+			TArray<FColor> VertexColors;// Empty vertex colors
 			TArray<FProcMeshTangent> Tangents; // Empty tangents
 
 			// Create Mesh Section for this face
 			Mesh->CreateMeshSection(FaceCount, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, true);
-			Mesh->SetMaterial(FaceCount, DefaultMaterial);
+			Mesh->SetMaterial(FaceCount, MeshMaterialInstance);
 
 			FaceCount++;
 		},

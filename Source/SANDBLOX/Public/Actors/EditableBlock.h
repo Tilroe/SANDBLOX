@@ -35,6 +35,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void AddVertex(FVector NewVertex);
 
+	UFUNCTION(BlueprintCallable)
+	void SetMaterial(UMaterialInstance* MaterialInstance);
+
 private:
 	UFUNCTION(BlueprintCallable)
 	bool GenerateBody();
@@ -44,12 +47,15 @@ private:
 	UPROPERTY(EditInstanceOnly, Category = "Shape")
 	TArray<FVector> Vertices;
 
-	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UPROPERTY(EditAnywhere, Category = "Material")
 	UMaterialInterface* TopMaterial;
 
-	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UPROPERTY(EditAnywhere, Category = "Material")
 	UMaterialInterface* BottomMaterial;
 
-	UPROPERTY(EditInstanceOnly, Category = "Material")
+	UPROPERTY(EditAnywhere, Category = "Material")
 	UMaterialInterface* DefaultMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Material")
+	UMaterialInstance* MeshMaterialInstance;
 };
