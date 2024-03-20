@@ -7,7 +7,9 @@
 #include "CompGeom/ConvexHull3.h"
 #include "IndexTypes.h"
 #include "Math/MathFwd.h"
+#include "Math/Box.h"
 #include "ProceduralMeshComponent.h"
+#include "Actors/Stud.h"
 
 // Sets default values
 AEditableBlock::AEditableBlock()
@@ -23,7 +25,6 @@ AEditableBlock::AEditableBlock()
 void AEditableBlock::BeginPlay()
 {
 	Super::BeginPlay();
-	GenerateBody();
 }
 
 FVector AEditableBlock::GetVertex(int32 Index)
@@ -51,23 +52,41 @@ void AEditableBlock::SetMaterial(UMaterialInstance* MaterialInstance)
 	// You can perform any additional operations you need here, such as applying the material to the mesh.
 }
 
-bool AEditableBlock::GenerateBody()
+bool AEditableBlock::GenerateBody(TArray<FVector> NewVertices, int32 Top)
 {
 	Mesh->ClearAllMeshSections();
 
 	// Compute the convex hull
 	UE::Geometry::FConvexHull3f ConvexHull;
 	ConvexHull.bSaveTriangleNeighbors = true;
-	bool result = ConvexHull.Solve<FVector3f>(TArray<FVector3f>(Vertices));
+	bool result = ConvexHull.Solve<FVector3f>(TArray<FVector3f>(NewVertices));
 	if (!result) { return false; }
-
-	/*UE_LOG(LogTemp, Warning, TEXT("%i"), Vertices.Num())
-	for (FVector v : Vertices) {
-		UE_LOG(LogTemp, Warning, TEXT("Vertex: %s"), *v.ToString())
-	}*/
 
 	// Convex hull triangles
 	TArray<UE::Geometry::FIndex3i> Triangles = ConvexHull.GetTriangles();
+
+	// Establish face indices and check shape validity
+	int32 FaceIdx = 1;
+	TArray<int32> FaceIndices;
+	bool DownwardsFaceExists = false;
+	ConvexHull.GetFaces(
+		[&](const TArray<int32> VertexIDs, const FVector3f FaceNormal)
+		{
+			FVector Normal = FVector(FaceNormal);
+			if (!DownwardsFaceExists) {
+				if (Normal.X == 0 && Normal.Y == 0 && Normal.Z < 0) {
+					DownwardsFaceExists = true;
+					FaceIndices.Push(0);
+				}
+			}
+			FaceIndices.Push(FaceIdx++);
+		},
+		[&](int32 Value) {return UE::Math::TVector<float>(NewVertices[Value]); }
+	);
+	if (!DownwardsFaceExists) { return false; }
+	if (Top > FaceIndices.Num() - 1) { return false; }
+
+	SetVertices(NewVertices);
 
 	// Add each face as a different section to procedural mesh component
 	int32 FaceCount = 0;
@@ -75,7 +94,8 @@ bool AEditableBlock::GenerateBody()
 		[&](const TArray<int32> VertexIDs, const FVector3f FaceNormal)
 		{
 			FVector Normal = FVector(FaceNormal);
-			UE_LOG(LogTemp, Warning, TEXT("Normal: %s"), *Normal.ToString())
+			int32 Section = FaceIndices[FaceCount];
+
 			// Get Vertices for this face, and map them to new face-local IDs
 			TMap<int32, int32> GlobalToLocalVertexIDMap;
 			TArray<FVector> FaceVertices;
@@ -122,7 +142,6 @@ bool AEditableBlock::GenerateBody()
 
 				// Normalize UV coordinates if necessary
 				UVCoords.Normalize();
-
 				UV0.Add(UVCoords);
 			}
 
@@ -130,14 +149,23 @@ bool AEditableBlock::GenerateBody()
 			TArray<FProcMeshTangent> Tangents; // Empty tangents
 
 			// Create Mesh Section for this face
-			Mesh->CreateMeshSection(FaceCount, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, true);
-			Mesh->SetMaterial(FaceCount, MeshMaterialInstance);
+			Mesh->CreateMeshSection(Section, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, true);
+			Mesh->SetMaterial(Section, MeshMaterialInstance);
 
+			if (Section == Top) {
+				UStud* NewStud = NewObject<UStud>(this, UStud::StaticClass());
+				NewStud->RegisterComponent();
+				NewStud->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+				NewStud->CreationMethod = EComponentCreationMethod::Instance;
+				NewStud->SetRelativeLocation(FBox(FaceVertices).GetCenter());
+				NewStud->AddRelativeRotation(Normal.Rotation() + FRotator(-90, 0, 0));
+				NewStud->SetMaterial(0, MeshMaterialInstance);
+			}
+			
 			FaceCount++;
 		},
 		[&](int32 Value) {return UE::Math::TVector<float>(this->GetVertex(Value)); }
 	);
-
 	return true;
 }
 

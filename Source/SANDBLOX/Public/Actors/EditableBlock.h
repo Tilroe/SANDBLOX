@@ -40,21 +40,12 @@ protected:
 
 private:
 	UFUNCTION(BlueprintCallable)
-	bool GenerateBody();
+	bool GenerateBody(TArray<FVector> NewVertices, int32 Top);
 
 	class UProceduralMeshComponent *Mesh;
 
 	UPROPERTY(EditInstanceOnly, Category = "Shape")
 	TArray<FVector> Vertices;
-
-	UPROPERTY(EditAnywhere, Category = "Material")
-	UMaterialInterface* TopMaterial;
-
-	UPROPERTY(EditAnywhere, Category = "Material")
-	UMaterialInterface* BottomMaterial;
-
-	UPROPERTY(EditAnywhere, Category = "Material")
-	UMaterialInterface* DefaultMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "Material")
 	UMaterialInstance* MeshMaterialInstance;
