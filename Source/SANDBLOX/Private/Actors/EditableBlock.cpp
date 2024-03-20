@@ -3,13 +3,14 @@
 
 #include "Actors/EditableBlock.h"
 #include "SANDBLOX/DrawBebugMacros.h"
+#include "SANDBLOX/FVectorHelper.h"
+#include "Actors/Stud.h"
 
 #include "CompGeom/ConvexHull3.h"
 #include "IndexTypes.h"
 #include "Math/MathFwd.h"
 #include "Math/Box.h"
 #include "ProceduralMeshComponent.h"
-#include "Actors/Stud.h"
 
 // Sets default values
 AEditableBlock::AEditableBlock()
@@ -152,12 +153,27 @@ bool AEditableBlock::GenerateBody(TArray<FVector> NewVertices, int32 Top)
 			Mesh->CreateMeshSection(Section, FaceVertices, FaceTriangles, Normals, UV0, VertexColors, Tangents, true);
 			Mesh->SetMaterial(Section, MeshMaterialInstance);
 
+			// Add Studs
 			if (Section == Top) {
+				FVector Center = AvergePosition(FaceVertices);
+
+				// Studs halfway between center of face and vertex
+				for (FVector Vertex : FaceVertices) {
+					UStud* NewStud = NewObject<UStud>(this, UStud::StaticClass());
+					NewStud->RegisterComponent();
+					NewStud->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+					NewStud->CreationMethod = EComponentCreationMethod::Instance;
+					NewStud->SetRelativeLocation(AvergePosition({Center, Vertex}));
+					NewStud->AddRelativeRotation(Normal.Rotation() + FRotator(-90, 0, 0));
+					NewStud->SetMaterial(0, MeshMaterialInstance);
+				}
+
+				// Stud at center of face
 				UStud* NewStud = NewObject<UStud>(this, UStud::StaticClass());
 				NewStud->RegisterComponent();
 				NewStud->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 				NewStud->CreationMethod = EComponentCreationMethod::Instance;
-				NewStud->SetRelativeLocation(FBox(FaceVertices).GetCenter());
+				NewStud->SetRelativeLocation(Center);
 				NewStud->AddRelativeRotation(Normal.Rotation() + FRotator(-90, 0, 0));
 				NewStud->SetMaterial(0, MeshMaterialInstance);
 			}
