@@ -266,26 +266,21 @@ bool AEditableBlock::GenerateBody(TArray<FVector> NewVertices, int32 Top)
 				bool RingValid = true;
 				FVector pLoc;
 
-				while (RingValid && RingLevel < 5) {
+				while (RingValid) {
 					RingValid = false;
-					UE_LOG(LogTemp, Warning, TEXT("Level %i"), RingLevel)
 					for (int x = -RingLevel; x <= RingLevel; ++x) {
 						pLoc = Center + (x * GridRight * GridSize) + (RingLevel * GridUp * GridSize);
-						DRAW_POINT(GetActorLocation() + pLoc)
 						if (IsPointInConvexPolygon(OrderedVertices, pLoc)) { AddStud(pLoc, Normal); RingValid = true; }
 
 						if (RingLevel > 0) {
 							pLoc = Center + (x * GridRight * GridSize) + (-RingLevel * GridUp * GridSize);
-							DRAW_POINT(GetActorLocation() + pLoc)
 							if (IsPointInConvexPolygon(OrderedVertices, pLoc)) { AddStud(pLoc, Normal); RingValid = true; }
 
 							if (x != -RingLevel && x != RingLevel) {
 								pLoc = Center + (RingLevel * GridRight * GridSize) + (x * GridUp * GridSize);
-								DRAW_POINT(GetActorLocation() + pLoc)
 								if (IsPointInConvexPolygon(OrderedVertices, pLoc)) { AddStud(pLoc, Normal); RingValid = true; }
 
 								pLoc = Center + (-RingLevel * GridRight * GridSize) + (x * GridUp * GridSize);
-								DRAW_POINT(GetActorLocation() + pLoc)
 								if (IsPointInConvexPolygon(OrderedVertices, pLoc)) { AddStud(pLoc, Normal); RingValid = true; }
 							}
 						}
