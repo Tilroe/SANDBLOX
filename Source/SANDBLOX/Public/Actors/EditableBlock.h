@@ -38,6 +38,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SetMaterial(UMaterialInstance* MaterialInstance);
 
+	void AddStud(FVector Location, FVector Normal);
+
 private:
 	UFUNCTION(BlueprintCallable)
 	bool GenerateBody(TArray<FVector> NewVertices, int32 Top);
