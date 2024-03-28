@@ -14,79 +14,79 @@
 
 #include <algorithm>
 
-const int32 GridSize = 20;
+const int32 GridSize = 40;
 
 // Helper Functions
 
 // Helper function to calculate the centroid of a polygon
-FVector CalculateCentroid(const TArray<FVector>& Points) {
-	FVector Centroid(0, 0, 0);
-	for (const FVector& Point : Points) {
-		Centroid += Point;
-	}
-	Centroid /= Points.Num();
-	return Centroid;
-}
-
-// Comparator function for sorting points by angle
-bool SortByAngle(const FVector& A, const FVector& B, const FVector& Centroid) {
-	FVector DirA = A - Centroid;
-	FVector DirB = B - Centroid;
-	float AngleA = FMath::Atan2(DirA.Y, DirA.X);
-	float AngleB = FMath::Atan2(DirB.Y, DirB.X);
-	return AngleA < AngleB;
-}
-
-// Function to order points of a convex polygon
-TArray<FVector> OrderPoints(TArray<FVector> Points) {
-	FVector Centroid = CalculateCentroid(Points);
-	Points.Sort([&](const FVector& A, const FVector& B) {
-		return SortByAngle(A, B, Centroid);
-		});
-	return Points;
-}
-
-bool IsPointInConvexPolygon(const TArray<FVector>& PolygonPoints, const FVector& P) {
-	// Assuming PolygonPoints.size() > 2 and they form a convex polygon
-	FVector Normal = FVector::CrossProduct(PolygonPoints[1] - PolygonPoints[0], PolygonPoints[2] - PolygonPoints[0]).GetSafeNormal();
-
-	for (int i = 0; i < PolygonPoints.Num(); ++i) {
-		FVector A = PolygonPoints[i];
-		FVector B = PolygonPoints[(i + 1) % PolygonPoints.Num()];
-		FVector Edge = B - A;
-		FVector PointToEdgeStart = P - A;
-		FVector EdgeDirection = Edge.GetSafeNormal();
-
-		// Project PointToEdgeStart onto Edge to find the closest point on the line extended from Edge
-		float ProjectionLength = FVector::DotProduct(PointToEdgeStart, EdgeDirection);
-		FVector ClosestPoint;
-		if (ProjectionLength < 0) {
-			// Closest to A
-			ClosestPoint = A;
-		}
-		else if (ProjectionLength > Edge.Size()) {
-			// Closest to B
-			ClosestPoint = B;
-		}
-		else {
-			// Closest point lies within the edge segment
-			ClosestPoint = A + EdgeDirection * ProjectionLength;
-		}
-
-		// Calculate distance from P to the closest point on the edge
-		float Distance = (P - ClosestPoint).Size();
-
-		FVector CrossProduct = FVector::CrossProduct(PointToEdgeStart, Edge);
-
-		// Modify condition to consider the point outside if it is within 5 units of an edge
-		if (FVector::DotProduct(CrossProduct, Normal) > 0 || Distance <= 5.0f) {
-			return false;
-		}
-	}
-
-	// If P passes all edge tests and is not within 5 units of any edge, it is inside the polygon
-	return true;
-}
+//FVector CalculateCentroid(const TArray<FVector>& Points) {
+//	FVector Centroid(0, 0, 0);
+//	for (const FVector& Point : Points) {
+//		Centroid += Point;
+//	}
+//	Centroid /= Points.Num();
+//	return Centroid;
+//}
+//
+//// Comparator function for sorting points by angle
+//bool SortByAngle(const FVector& A, const FVector& B, const FVector& Centroid) {
+//	FVector DirA = A - Centroid;
+//	FVector DirB = B - Centroid;
+//	float AngleA = FMath::Atan2(DirA.Y, DirA.X);
+//	float AngleB = FMath::Atan2(DirB.Y, DirB.X);
+//	return AngleA < AngleB;
+//}
+//
+//// Function to order points of a convex polygon
+//TArray<FVector> OrderPoints(TArray<FVector> Points) {
+//	FVector Centroid = CalculateCentroid(Points);
+//	Points.Sort([&](const FVector& A, const FVector& B) {
+//		return SortByAngle(A, B, Centroid);
+//		});
+//	return Points;
+//}
+//
+//bool IsPointInConvexPolygon(const TArray<FVector>& PolygonPoints, const FVector& P) {
+//	// Assuming PolygonPoints.size() > 2 and they form a convex polygon
+//	FVector Normal = FVector::CrossProduct(PolygonPoints[1] - PolygonPoints[0], PolygonPoints[2] - PolygonPoints[0]).GetSafeNormal();
+//
+//	for (int i = 0; i < PolygonPoints.Num(); ++i) {
+//		FVector A = PolygonPoints[i];
+//		FVector B = PolygonPoints[(i + 1) % PolygonPoints.Num()];
+//		FVector Edge = B - A;
+//		FVector PointToEdgeStart = P - A;
+//		FVector EdgeDirection = Edge.GetSafeNormal();
+//
+//		// Project PointToEdgeStart onto Edge to find the closest point on the line extended from Edge
+//		float ProjectionLength = FVector::DotProduct(PointToEdgeStart, EdgeDirection);
+//		FVector ClosestPoint;
+//		if (ProjectionLength < 0) {
+//			// Closest to A
+//			ClosestPoint = A;
+//		}
+//		else if (ProjectionLength > Edge.Size()) {
+//			// Closest to B
+//			ClosestPoint = B;
+//		}
+//		else {
+//			// Closest point lies within the edge segment
+//			ClosestPoint = A + EdgeDirection * ProjectionLength;
+//		}
+//
+//		// Calculate distance from P to the closest point on the edge
+//		float Distance = (P - ClosestPoint).Size();
+//
+//		FVector CrossProduct = FVector::CrossProduct(PointToEdgeStart, Edge);
+//
+//		// Modify condition to consider the point outside if it is within 5 units of an edge
+//		if (FVector::DotProduct(CrossProduct, Normal) > 0 || Distance <= 5.0f) {
+//			return false;
+//		}
+//	}
+//
+//	// If P passes all edge tests and is not within 5 units of any edge, it is inside the polygon
+//	return true;
+//}
 
 
 // Sets default values
@@ -115,6 +115,36 @@ TArray<FVector> AEditableBlock::GetVertices()
 	return Vertices;
 }
 
+int AEditableBlock::GetXFactor()
+{
+	return XFactor;
+}
+
+int AEditableBlock::GetYFactor()
+{
+	return YFactor;
+}
+
+int AEditableBlock::GetZFactor()
+{
+	return ZFactor;
+}
+
+int AEditableBlock::GetXPivot()
+{
+	return XPivot;
+}
+
+int AEditableBlock::GetYPivot()
+{
+	return YPivot;
+}
+
+int AEditableBlock::GetTop()
+{
+	return Top;
+}
+
 void AEditableBlock::SetVertices(TArray<FVector> NewVertices)
 {
 	Vertices = NewVertices;
@@ -141,9 +171,45 @@ void AEditableBlock::AddStud(FVector Location, FVector Normal)
 	NewStud->SetMaterial(0, MeshMaterialInstance);
 }
 
-bool AEditableBlock::GenerateBody(TArray<FVector> NewVertices, int32 Top)
+bool AEditableBlock::GenerateBody(int NewXFactor, int NewYFactor, int NewZFactor, int NewXPivot, int NewYPivot, int32 NewTop)
 {
 	Mesh->ClearAllMeshSections();
+
+	XFactor = NewXFactor;
+	YFactor = NewYFactor;
+	ZFactor = NewZFactor;
+	XPivot = NewXPivot;
+	YPivot = NewYPivot;
+	Top = NewTop;
+
+	// Pivot Check
+	if (XPivot > XFactor ||
+		XPivot < 1 ||
+		YPivot > YFactor ||
+		YPivot < 1) {
+		return false;
+	}
+
+	// Top Check
+	if (Top > 5 || Top < 1) { return false; }
+
+	// Compute Vertices
+	int XBig = (XFactor - XPivot) * GridSize + GridSize/2;
+	int XSmall = XBig - XFactor * GridSize;
+	int YBig = (YFactor - YPivot) * GridSize + GridSize / 2;
+	int YSmall = YBig - YFactor * GridSize;
+	int ZBig = ZFactor * GridSize;
+	int ZSmall = 0;
+	TArray<FVector> NewVertices = {
+		FVector(XSmall, YSmall, ZSmall),
+		FVector(XBig,	YSmall, ZSmall),
+		FVector(XSmall, YBig,	ZSmall),
+		FVector(XBig,	YBig,	ZSmall),
+		FVector(XSmall, YSmall, ZBig),
+		FVector(XBig,	YSmall, ZBig),
+		FVector(XSmall, YBig,	ZBig),
+		FVector(XBig,	YBig,	ZBig),
+	};
 
 	// Compute the convex hull
 	UE::Geometry::FConvexHull3f ConvexHull;
@@ -154,7 +220,7 @@ bool AEditableBlock::GenerateBody(TArray<FVector> NewVertices, int32 Top)
 	// Convex hull triangles
 	TArray<UE::Geometry::FIndex3i> Triangles = ConvexHull.GetTriangles();
 
-	// Establish face indices and check shape validity
+	// Establish face indices (0 = bottom)
 	int32 FaceIdx = 1;
 	TArray<int32> FaceIndices;
 	bool DownwardsFaceExists = false;
@@ -172,9 +238,8 @@ bool AEditableBlock::GenerateBody(TArray<FVector> NewVertices, int32 Top)
 		},
 		[&](int32 Value) {return UE::Math::TVector<float>(NewVertices[Value]); }
 	);
-	if (!DownwardsFaceExists) { return false; }
-	if (Top > FaceIndices.Num() - 1) { return false; }
 
+	// Set new vertices (not really needed anymore)
 	SetVertices(NewVertices);
 
 	// Add each face as a different section to procedural mesh component
@@ -247,8 +312,8 @@ bool AEditableBlock::GenerateBody(TArray<FVector> NewVertices, int32 Top)
 
 				// GridUp and GridRight define the axes/plane to create studs on
 				FVector GridUp, GridRight;
-				if (Normal.Z == 0) { 
-					GridUp = FVector::UpVector; 
+				if (Normal.Z == 0) {
+					GridUp = FVector::UpVector;
 					GridRight = FVector::CrossProduct(GridUp, Normal);
 				}
 				else {
@@ -257,36 +322,7 @@ bool AEditableBlock::GenerateBody(TArray<FVector> NewVertices, int32 Top)
 				}
 				bool r1 = GridUp.Normalize();
 				bool r2 = GridRight.Normalize();
-
-				// Order the vertices to create a closed loop for point-in-polygon algorithm
-				TArray<FVector> OrderedVertices = OrderPoints(FaceVertices);
-				
-				// Spawn studs in rings until there is a ring we can no longer spawn studs on
-				int RingLevel = 0;
-				bool RingValid = true;
-				FVector pLoc;
-
-				while (RingValid) {
-					RingValid = false;
-					for (int x = -RingLevel; x <= RingLevel; ++x) {
-						pLoc = Center + (x * GridRight * GridSize) + (RingLevel * GridUp * GridSize);
-						if (IsPointInConvexPolygon(OrderedVertices, pLoc)) { AddStud(pLoc, Normal); RingValid = true; }
-
-						if (RingLevel > 0) {
-							pLoc = Center + (x * GridRight * GridSize) + (-RingLevel * GridUp * GridSize);
-							if (IsPointInConvexPolygon(OrderedVertices, pLoc)) { AddStud(pLoc, Normal); RingValid = true; }
-
-							if (x != -RingLevel && x != RingLevel) {
-								pLoc = Center + (RingLevel * GridRight * GridSize) + (x * GridUp * GridSize);
-								if (IsPointInConvexPolygon(OrderedVertices, pLoc)) { AddStud(pLoc, Normal); RingValid = true; }
-
-								pLoc = Center + (-RingLevel * GridRight * GridSize) + (x * GridUp * GridSize);
-								if (IsPointInConvexPolygon(OrderedVertices, pLoc)) { AddStud(pLoc, Normal); RingValid = true; }
-							}
-						}
-					}
-					RingLevel++;
-				}
+				AddStud(Center, Normal);
 			}
 			
 			FaceCount++;
