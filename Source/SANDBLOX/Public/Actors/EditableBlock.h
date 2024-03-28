@@ -19,8 +19,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	void CreateCustomBlock(TArray<FVector> VertexPositions);
 
 protected:
 	// Called when the game starts or when spawned
