@@ -32,6 +32,24 @@ protected:
 	UFUNCTION(BlueprintPure)
 	TArray<FVector> GetVertices();
 
+	UFUNCTION(BlueprintPure)
+	int GetXFactor();
+
+	UFUNCTION(BlueprintPure)
+	int GetYFactor();
+
+	UFUNCTION(BlueprintPure)
+	int GetZFactor();
+
+	UFUNCTION(BlueprintPure)
+	int GetXPivot();
+
+	UFUNCTION(BlueprintPure)
+	int GetYPivot();
+
+	UFUNCTION(BlueprintPure)
+	int GetTop();
+
 	UFUNCTION(BlueprintCallable)
 	void SetVertices(TArray<FVector> NewVertices);
 
@@ -41,14 +59,34 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SetMaterial(UMaterialInstance* MaterialInstance);
 
+	void AddStud(FVector Location, FVector Normal);
+
 private:
 	UFUNCTION(BlueprintCallable)
-	bool GenerateBody(TArray<FVector> NewVertices, int32 Top);
+	bool GenerateBody(int XFactor, int YFactor, int ZFactor, int XPivot, int YPivot, int32 Top);
 
 	class UProceduralMeshComponent *Mesh;
 
-	UPROPERTY(EditInstanceOnly, Category = "Shape")
+	UPROPERTY(VisibleInstanceOnly, Category = "Shape")
 	TArray<FVector> Vertices;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Shape")
+	int32 XFactor = 0;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Shape")
+	int32 YFactor = 0;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Shape")
+	int32 ZFactor = 0;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Shape")
+	int32 XPivot = 0;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Shape")
+	int32 YPivot = 0;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Shape")
+	int32 Top = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Material")
 	UMaterialInstance* MeshMaterialInstance;
