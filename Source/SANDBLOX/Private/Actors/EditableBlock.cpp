@@ -16,79 +16,6 @@
 
 const int32 GridSize = 40;
 
-// Helper Functions
-
-// Helper function to calculate the centroid of a polygon
-//FVector CalculateCentroid(const TArray<FVector>& Points) {
-//	FVector Centroid(0, 0, 0);
-//	for (const FVector& Point : Points) {
-//		Centroid += Point;
-//	}
-//	Centroid /= Points.Num();
-//	return Centroid;
-//}
-//
-//// Comparator function for sorting points by angle
-//bool SortByAngle(const FVector& A, const FVector& B, const FVector& Centroid) {
-//	FVector DirA = A - Centroid;
-//	FVector DirB = B - Centroid;
-//	float AngleA = FMath::Atan2(DirA.Y, DirA.X);
-//	float AngleB = FMath::Atan2(DirB.Y, DirB.X);
-//	return AngleA < AngleB;
-//}
-//
-//// Function to order points of a convex polygon
-//TArray<FVector> OrderPoints(TArray<FVector> Points) {
-//	FVector Centroid = CalculateCentroid(Points);
-//	Points.Sort([&](const FVector& A, const FVector& B) {
-//		return SortByAngle(A, B, Centroid);
-//		});
-//	return Points;
-//}
-//
-//bool IsPointInConvexPolygon(const TArray<FVector>& PolygonPoints, const FVector& P) {
-//	// Assuming PolygonPoints.size() > 2 and they form a convex polygon
-//	FVector Normal = FVector::CrossProduct(PolygonPoints[1] - PolygonPoints[0], PolygonPoints[2] - PolygonPoints[0]).GetSafeNormal();
-//
-//	for (int i = 0; i < PolygonPoints.Num(); ++i) {
-//		FVector A = PolygonPoints[i];
-//		FVector B = PolygonPoints[(i + 1) % PolygonPoints.Num()];
-//		FVector Edge = B - A;
-//		FVector PointToEdgeStart = P - A;
-//		FVector EdgeDirection = Edge.GetSafeNormal();
-//
-//		// Project PointToEdgeStart onto Edge to find the closest point on the line extended from Edge
-//		float ProjectionLength = FVector::DotProduct(PointToEdgeStart, EdgeDirection);
-//		FVector ClosestPoint;
-//		if (ProjectionLength < 0) {
-//			// Closest to A
-//			ClosestPoint = A;
-//		}
-//		else if (ProjectionLength > Edge.Size()) {
-//			// Closest to B
-//			ClosestPoint = B;
-//		}
-//		else {
-//			// Closest point lies within the edge segment
-//			ClosestPoint = A + EdgeDirection * ProjectionLength;
-//		}
-//
-//		// Calculate distance from P to the closest point on the edge
-//		float Distance = (P - ClosestPoint).Size();
-//
-//		FVector CrossProduct = FVector::CrossProduct(PointToEdgeStart, Edge);
-//
-//		// Modify condition to consider the point outside if it is within 5 units of an edge
-//		if (FVector::DotProduct(CrossProduct, Normal) > 0 || Distance <= 5.0f) {
-//			return false;
-//		}
-//	}
-//
-//	// If P passes all edge tests and is not within 5 units of any edge, it is inside the polygon
-//	return true;
-//}
-
-
 // Sets default values
 AEditableBlock::AEditableBlock()
 {
@@ -309,21 +236,27 @@ bool AEditableBlock::GenerateBody(int NewXFactor, int NewYFactor, int NewZFactor
 
 			// Add Studs
 			if (Section == Top) {
-				FVector Center = AvergePosition(FaceVertices);
-
-				// GridUp and GridRight define the axes/plane to create studs on
-				FVector GridUp, GridRight;
-				if (Normal.Z == 0) {
-					GridUp = FVector::UpVector;
-					GridRight = FVector::CrossProduct(GridUp, Normal);
+				if (Normal.X != 0) {
+					for (int y = YSmall + GridSize / 2; y <= YBig - GridSize / 2; y += GridSize) {
+						for (int z = GridSize / 2; z <= ZBig - GridSize / 2; z += GridSize) {
+							AddStud(FVector(FaceVertices[0].X, y, z), Normal);
+						}
+					}
+				}
+				else if (Normal.Y != 0) {
+					for (int x = XSmall + GridSize / 2; x <= XBig - GridSize / 2; x += GridSize) {
+						for (int z = GridSize / 2; z <= ZBig - GridSize / 2; z += GridSize) {
+							AddStud(FVector(x, FaceVertices[0].Y, z), Normal);
+						}
+					}
 				}
 				else {
-					GridUp = FVector::VectorPlaneProject(FVector(1, 0, 0), Normal);
-					GridRight = FVector::VectorPlaneProject(FVector(0, 1, 0), Normal);
+					for (int x = XSmall + GridSize / 2; x <= XBig - GridSize / 2; x += GridSize) {
+						for (int y = YSmall + GridSize / 2; y <= YBig - GridSize / 2; y += GridSize) {
+							AddStud(FVector(x, y, FaceVertices[0].Z), Normal);
+						}
+					}
 				}
-				bool r1 = GridUp.Normalize();
-				bool r2 = GridRight.Normalize();
-				AddStud(Center, Normal);
 			}
 			
 			FaceCount++;
