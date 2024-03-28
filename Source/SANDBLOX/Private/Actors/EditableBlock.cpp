@@ -99,6 +99,17 @@ AEditableBlock::AEditableBlock()
 	Vertices = {};
 }
 
+void AEditableBlock::CreateCustomBlock(TArray<FVector> VertexPositions)
+{
+	// You might want to validate the input here
+
+	// Now, set the vertices to what the user input
+	SetVertices(VertexPositions);
+
+	// Optionally, regenerate the procedural mesh if needed
+	GenerateBody(VertexPositions, /*Top=*/0); // Adjust the 'Top' parameter as needed
+}
+
 // Called when the game starts or when spawned
 void AEditableBlock::BeginPlay()
 {
