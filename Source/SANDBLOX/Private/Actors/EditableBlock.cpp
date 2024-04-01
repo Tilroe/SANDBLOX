@@ -151,17 +151,17 @@ bool AEditableBlock::GenerateBody(int NewXFactor, int NewYFactor, int NewZFactor
 	// Establish face indices (0 = bottom)
 	int32 FaceIdx = 1;
 	TArray<int32> FaceIndices;
-	bool DownwardsFaceExists = false;
+	TMap<FVector, int32> NormMapping;
 	ConvexHull.GetFaces(
 		[&](const TArray<int32> VertexIDs, const FVector3f FaceNormal)
 		{
 			FVector Normal = FVector(FaceNormal);
-			if (Normal.Z < 0) { FaceIndices.Push(0); }
-			else if (Normal.Z > 0) { FaceIndices.Push(5); }
-			else if (Normal.X > 0) { FaceIndices.Push(1); }
-			else if (Normal.Y < 0) { FaceIndices.Push(2); }
-			else if (Normal.X < 0) { FaceIndices.Push(3); }
-			else if (Normal.Y > 0) { FaceIndices.Push(4); }
+			if (Normal.Z < 0) { NormMapping.Add(TTuple<FVector, int32>(Normal, 0)); }
+			else if (Normal.Z > 0) { NormMapping.Add(TTuple<FVector, int32>(Normal, 5)); }
+			else if (Normal.X > 0) { NormMapping.Add(TTuple<FVector, int32>(Normal, 1)); }
+			else if (Normal.Y < 0) { NormMapping.Add(TTuple<FVector, int32>(Normal, 2)); }
+			else if (Normal.X < 0) { NormMapping.Add(TTuple<FVector, int32>(Normal, 3)); }
+			else if (Normal.Y > 0) { NormMapping.Add(TTuple<FVector, int32>(Normal, 4)); }
 		},
 		[&](int32 Value) {return UE::Math::TVector<float>(NewVertices[Value]); }
 	);
@@ -175,7 +175,7 @@ bool AEditableBlock::GenerateBody(int NewXFactor, int NewYFactor, int NewZFactor
 		[&](const TArray<int32> VertexIDs, const FVector3f FaceNormal)
 		{
 			FVector Normal = FVector(FaceNormal);
-			int32 Section = FaceIndices[FaceCount];
+			int32 Section = NormMapping[Normal];
 
 			// Get Vertices for this face, and map them to new face-local IDs
 			TMap<int32, int32> GlobalToLocalVertexIDMap;
