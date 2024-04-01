@@ -156,13 +156,12 @@ bool AEditableBlock::GenerateBody(int NewXFactor, int NewYFactor, int NewZFactor
 		[&](const TArray<int32> VertexIDs, const FVector3f FaceNormal)
 		{
 			FVector Normal = FVector(FaceNormal);
-			if (!DownwardsFaceExists) {
-				if (Normal.X == 0 && Normal.Y == 0 && Normal.Z < 0) {
-					DownwardsFaceExists = true;
-					FaceIndices.Push(0);
-				}
-			}
-			FaceIndices.Push(FaceIdx++);
+			if (Normal.Z < 0) { FaceIndices.Push(0); }
+			else if (Normal.Z > 0) { FaceIndices.Push(5); }
+			else if (Normal.X > 0) { FaceIndices.Push(1); }
+			else if (Normal.Y < 0) { FaceIndices.Push(2); }
+			else if (Normal.X < 0) { FaceIndices.Push(3); }
+			else if (Normal.Y > 0) { FaceIndices.Push(4); }
 		},
 		[&](int32 Value) {return UE::Math::TVector<float>(NewVertices[Value]); }
 	);
