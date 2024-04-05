@@ -1,0 +1,101 @@
+SANDBLOX - Test Suite
+________________
+
+1 - Lobbies
+
+1.1 Lobby.Join
+1. Open application (Client 1)
+2. Set ‘Use LAN’ to ‘Yes’
+3. Click create game
+4. Open application again (Client 2)
+5. Select ‘Matches’
+6. Join existing match
+
+1.2 Lobby.Leave
+1. Open application
+2. Set ‘Use LAN’ to ‘Yes’
+3. Click create game
+4. Press ‘Esc’
+5. Click Disconnect
+
+1.3 Lobby.Create
+1. Open application
+2. Set ‘Use LAN’ to ‘Yes’
+3. Click create game
+1.4 Lobby.Delete
+
+1. Open application (Client 1)
+2. Set ‘Use LAN’ to ‘Yes’
+3. Click create game
+4. Open application again (Client 2)
+5. Select ‘Matches’
+6. See match in match list
+7. Leave Lobby (Client 1)
+8. Refresh match list (Client 2)
+9. See no more matches
+________________
+
+2 - Blocks
+
+2.1 - Block.Design
+1. Open application
+2. Create lobby
+3. Open block design interface [F]
+4. Input parameters and press generate
+5. Close block design interface [F]
+6. Open block inventory [L]
+7. See new block slot in inventory
+8. The geometry of the new design should match the user input
+
+2.2 - Block.Place
+1. Open application
+2. Create lobby
+3. Press [X] to toggle build mode
+4. Open block inventory [L]
+5. Click on inventory slot to select block
+6. Click on stud to place block
+7. The block should show up correctly
+
+2.3 - Block.Delete
+1. Follow steps to place block
+2. Right click to delete block
+
+2.4 - Block.Rotate
+1. Open application
+2. Create lobby
+3. Press [X] to toggle build mode
+4. Open block inventory [L]
+5. Click on inventory slot to select block
+6. Hover over stud
+7. Press [R] to rotate block
+
+2.5 - Block.SelectColour
+1. Open application
+2. Create lobby
+3. Open block colour interface [P]
+4. Click on colour wheel
+5. Click confirm
+6. Click exit to close colour wheel
+7. Follow steps to place block
+________________
+
+3 - Map
+
+3.1 - Map.Edit & Map.Save
+1. Open application
+2. On ‘Continue Saved Game’ select ‘No’
+3. Create lobby
+4. Place block(s)
+5. Disconnect from lobby
+6. On ‘Continue Saved Game’ select ‘Yes’
+7. Create lobby
+8. See persisting changes
+4 - ChatBox
+
+4.1 - Chatbox.Send & Chatbox.Receive
+1. Follow procedures in (1.1 - Lobby.Join) for two clients
+2. On client 1, click ‘Open Chat Box’
+3. Click on ‘Enter Chat’ field
+4. Type message
+5. Press [Enter] to send chat
+6. On client 2, see chat from client 1
