@@ -12,5 +12,5 @@ UStud::UStud()
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Failed to load stud mesh"));
 	}
-	
+	SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 }
